@@ -32,7 +32,19 @@ errAbort(
 	"usage:\n"
 	"   wgHmm chrom.sizes noGaps.bed numberOfStates transition.matrix emissionProbs.wig output.bed\n"
 	"options:\n"
-	" -inputIsLog\n"
+	" -inputIsLog  (false)  This flag says that the transition matrix and the\n"
+	"                        emisison probabilities are both in log-space.  This\n"
+	"                        is probably a good idea in most cases.\n"
+	"notes:\n"
+	" chrom.sizes - tab separated file where the first column is the name\n"
+	"                of the chromosome and the second column is the length\n"
+	" noGaps.bed - bed file of regions no overlapping an assembly gap\n"
+	" numberOfStates - number of states in the HMM/transducer\n"
+	" transition.matrix - is a tab separated file where column X\n"
+	"                      row Y gives the transition probabiliy\n"
+	"                      from state X to state Y\n"
+	" emissionProbs.wig - based on a fixed-step wiggle file, but with multiple columns\n"
+	"                      one for each state.\n"
 	);
 }
 
