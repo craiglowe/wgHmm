@@ -17,11 +17,13 @@ Written by Craig Lowe
 
 static struct optionSpec optionSpecs[] =
 {
+	{"defaultState", OPTION_INT},
 	{"inputIsLog", OPTION_BOOLEAN},
 	{NULL, 0}
 };
 
 boolean optInputIsLog = FALSE;
+int optDefaultState = -1;
 
 /*---------------------------------------------------------------------------*/
 
@@ -32,9 +34,11 @@ errAbort(
 	"usage:\n"
 	"   wgHmm chrom.sizes noGaps.bed numberOfStates transition.matrix emissionProbs.wig output.bed\n"
 	"options:\n"
-	" -inputIsLog  (false)  This flag says that the transition matrix and the\n"
+	" -inputIsLog   (false)  This flag says that the transition matrix and the\n"
 	"                        emisison probabilities are both in log-space.  This\n"
 	"                        is probably a good idea in most cases.\n"
+	" -defaultState (none)   This will report of Lod-Score comparing the selected\n"
+	"                         state to the default state\n"
 	"notes:\n"
 	" chrom.sizes - tab separated file where the first column is the name\n"
 	"                of the chromosome and the second column is the length\n"
@@ -120,7 +124,8 @@ void printBedList(char *outputFilename, struct bed *head)
 
 	for(curr=head; curr != NULL; curr=curr->next)
 	{
-		bedTabOutN(curr, 4, outFile);
+		if(optDefaultState >= 0){bedTabOutN(curr, 5, outFile);}
+		else{bedTabOutN(curr, 4, outFile);}
 	}
 	carefulClose(&outFile);
 }
@@ -251,7 +256,7 @@ void wgHmm(unsigned int numStates, char *chromInfoFilename, char *noGapFilename,
 	setTransitionProbs(numStates, transitionMatrixFilename, startingProbs, transitionProbs);
 
 	verbose(2, "Finding the viterbi path\n");
-	regions = genomeWideViterbiPath(noGapBedList, numStates, emission, transitionProbs, startingProbs);
+	regions = genomeWideViterbiPath(noGapBedList, numStates, emission, transitionProbs, startingProbs, optDefaultState);
 
 	verbose(2, "Printing results\n");
 	printBedList(outputBedFilename, regions);
@@ -269,6 +274,7 @@ int main(int argc, char *argv[])
 	if (argc != 7){usage();}
 
 	optInputIsLog = optionExists("inputIsLog");
+	optDefaultState = optionInt("defaultState", optDefaultState);
 
 	char *chromInfoFilename = argv[1];
 	char *noGapFilename = argv[2];

@@ -177,7 +177,6 @@ struct bed *viterbiPath(struct bed *roi, unsigned int numStates, struct hash *em
 				possibleOrigin[prevState] = stateProb[prevState][x-1] + transitionProbs[prevState][state] + emissionProbs[state][xGenome];
 			}
 			stateProb[state][x] = dNMax(possibleOrigin, numStates, &(path[state][x]));
-			//if(xGenome >= 6063685 && xGenome <= 6063710){uglyf("%u %u %e %e\n", xGenome, state, emissionProbs[state][xGenome], stateProb[state][x]);}
 			//stateProb[state][x] = dThreeMax(stateProb[0][x-1] + transitionProbs[0][state] + emissionProbs[state][xGenome],
 			//		stateProb[1][x-1] + transitionProbs[1][state] + emissionProbs[state][xGenome],
 			//		stateProb[2][x-1] + transitionProbs[2][state] + emissionProbs[state][xGenome],
@@ -224,7 +223,7 @@ struct bed *viterbiPath(struct bed *roi, unsigned int numStates, struct hash *em
 	return(regions);
 }
 
-void addLodScore(struct hash *emissionProbsHash, struct bed *regionList)
+void addLodScore(struct hash *emissionProbsHash, struct bed *regionList, int defaultState)
 {
 	struct bed *region = NULL;
 	unsigned int x = 0;
@@ -237,7 +236,7 @@ void addLodScore(struct hash *emissionProbsHash, struct bed *regionList)
 		sum = 0;
 		for(x=region->chromStart; x<region->chromEnd; x++)
 		{
-			sum += emissionProbs[sqlUnsigned(region->name)][x] - emissionProbs[1][x];
+			sum += emissionProbs[sqlUnsigned(region->name)][x] - emissionProbs[defaultState][x];
 		}
 		region->score = (int)(sum/log(10));
 	}
@@ -257,7 +256,7 @@ struct bed *bedCat(struct bed *a, struct bed *b)
 }
 
 
-struct bed *genomeWideViterbiPath(struct bed *noGapList, unsigned int numStates, struct hash *emissionProbsHash, double **transitionProbs, double *startingProbs)
+struct bed *genomeWideViterbiPath(struct bed *noGapList, unsigned int numStates, struct hash *emissionProbsHash, double **transitionProbs, double *startingProbs, int defaultState)
 {
 	struct bed *roi = NULL, *altRegions = NULL, *temp = NULL;
 
@@ -265,7 +264,7 @@ struct bed *genomeWideViterbiPath(struct bed *noGapList, unsigned int numStates,
 	{
 		verbose(4, "starting region: %s %u %u\n", roi->chrom, roi->chromStart, roi->chromEnd);
 		temp = viterbiPath(roi, numStates, emissionProbsHash, transitionProbs, startingProbs);
-		//addLodScore(emissionProbsHash, temp);
+		if(defaultState >= 0){addLodScore(emissionProbsHash, temp, defaultState);}
 		altRegions = bedCat(altRegions, temp);
 	}
 	return(altRegions);

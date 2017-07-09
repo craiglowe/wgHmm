@@ -21,19 +21,19 @@ L += /home/lowec/kent/src/lib/${MACHTYPE}/jkweb.a
 # If none of that sounded familiar to you, then you probably don't
 # need to edit this.
 #
-ifeq (${USE_BAM},1)
-	SAMINC = ${SAMDIR}
-	SAMLIB = ${SAMDIR}/lib/libbam.a
-	HG_INC += -I${SAMINC}
-	L+=${SAMLIB}
-	HG_DEFS+=-DUSE_BAM
-	HG_DEFS+=-DKNETFILE_HOOKS
-	TABIXINC = ${TABIXDIR}
-	TABIXLIB = ${TABIXDIR}/libtabix.a
-	HG_INC += -I${TABIXINC}
-	L+=${TABIXLIB} -lz
-	HG_DEFS+=-DUSE_TABIX
-	HG_DEFS+=-DKNETFILE_HOOKS
+ifeq (${USE_SAMTABIX},1)
+    KNETFILE_HOOKS=1
+    USE_BAM=1
+    USE_TABIX=1
+    ifeq (${SAMTABIXINC},)
+        SAMTABIXINC = ${SAMTABIXDIR}
+    endif
+    ifeq (${SAMTABIXLIB},)
+        SAMTABIXLIB = ${SAMTABIXDIR}/libsamtabix.a
+    endif
+    HG_INC += -I${SAMTABIXINC}
+    L+=${SAMTABIXLIB} -lz
+    HG_DEFS+=-DUSE_SAMTABIX -DUSE_BAM -DUSE_TABIX -DKNETFILE_HOOKS
 endif
 #
 # End of sam/bam and tabix editing
