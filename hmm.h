@@ -12,7 +12,7 @@ double addLog(double x, double y );
 
 double subtractLog(double x, double y);
 
-struct bed *genomeWideViterbiPath(struct bed *noGapList, unsigned int numStates, struct hash *emissionProbsHash, double **transitionProbs, double *startingProbs);
+struct bed *genomeWideViterbiPath(struct bed *noGapList, unsigned int numStates, struct hash *emissionProbsHash, double **transitionProbs, double *startingProbs, int defaultState);
 
 #endif
 
