@@ -109,7 +109,7 @@ struct slChrom *readChromInfoFile(char *chromSizeFilename)
 	{
 		chrom = row[0];
 		chromLength = sqlUnsigned(row[1]);
-		currChrom = createChrom(row[0], chromLength);
+		currChrom = createChrom(chrom, chromLength);
 		currChrom->next = chromList;
 		chromList = currChrom;
 	}
